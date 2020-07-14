@@ -1,10 +1,10 @@
 import pygame
 import random
 from os import path
-
+import shelve
 
 pygame.init()
-#used to initialize the pygame module.
+#used to initialize the pygame module.    
 
 #Creating a window for our game.
 app = pygame.display.set_mode((700, 700))
@@ -12,7 +12,7 @@ app = pygame.display.set_mode((700, 700))
 joystick = pygame.joystick.get_count()
 if joystick == 0:
     # No joysticks!
-    print("Sorry, Game have found that no joystick is attached.")
+    print("Game have found that no joystick is attached.")
 else:
     joystick = pygame.joystick.Joystick(0)
     joystick.init()
@@ -23,16 +23,38 @@ pygame.display.set_caption("Game")
 #loading images form my storage location.
 
 bg = pygame.image.load(path.join(path.dirname(__file__), "data","road.png"))
-blue_car = pygame.image.load(path.join(path.dirname(__file__), "data","blue.png"))
-red_car = pygame.image.load(path.join(path.dirname(__file__), "data","red.png"))
-yellow_car = pygame.image.load(path.join(path.dirname(__file__), "data","yellow.png"))
-white_car = pygame.image.load(path.join(path.dirname(__file__), "data","white.png"))
-strip = pygame.image.load(path.join(path.dirname(__file__), "data","strip.png"))
 boom = pygame.image.load(path.join(path.dirname(__file__), "data","boom.png"))
 tree = pygame.image.load(path.join(path.dirname(__file__), "data","tree.png"))
+car_0 = pygame.image.load(path.join(path.dirname(__file__), "data","red.png"))
+car_1 = pygame.image.load(path.join(path.dirname(__file__), "data","car1.png"))
+car_2 = pygame.image.load(path.join(path.dirname(__file__), "data","car2.png"))
+car_3 = pygame.image.load(path.join(path.dirname(__file__), "data","car3.png"))
+car_4 = pygame.image.load(path.join(path.dirname(__file__), "data","car4.png"))
+car_5 = pygame.image.load(path.join(path.dirname(__file__), "data","car5.png"))
+strip = pygame.image.load(path.join(path.dirname(__file__), "data","strip.png"))
+blue_car = pygame.image.load(path.join(path.dirname(__file__), "data","blue.png"))
+white_car = pygame.image.load(path.join(path.dirname(__file__), "data","white.png"))
+yellow_car = pygame.image.load(path.join(path.dirname(__file__), "data","yellow.png"))
+
 #importing crash sound
 crash = pygame.mixer.Sound(path.join(path.dirname(__file__), "data","crash.wav"))
 
+# importing game's high scores.
+high_score= path.join(path.dirname(__file__), "data","score")
+
+try:
+    score_file = shelve.open(high_score)   
+    h_score  = score_file['score']         
+
+except:
+    score_file = shelve.open(high_score)   
+    score_file['score']=0
+    score_file.close()
+    score_file =shelve.open(high_score)
+
+class car_variable(object):
+    def __init__(self):
+        self.player_car = car_0 #default car
 
 #Creating variables to move our car in window
 x = 200
@@ -99,7 +121,7 @@ def images():
   app.blit(tree, (tr, t6))
 
   #inserting images of car.
-  app.blit(red_car, (x, y))
+  app.blit(var.player_car, (x, y))
   app.blit(yellow_car, (a, a1))
   app.blit(blue_car, (c, c1))
   app.blit(white_car, (b, b1))
@@ -110,35 +132,45 @@ def images():
     text = font.render("Score: "+str(score), 1, (255, 255, 255))
     app.blit(text, (55, 10))
 
+  font = pygame.font.Font(None, 50)
+  text = font.render("High Score: "+str(h_score), 1, (255, 255, 255))
+  app.blit(text, (370, 10))
+
+
   pygame.display.update()
   #it is a function to update screen.
 #-------------------------------------------------------
 
 #The Case for Accident:
-
-
 def accident(x, y):
   app.blit(boom, (x, y))
   pygame.display.update()
   pygame.time.delay(500)
 
 #Game Over Screen
-
-
 def game_over_screen():
-
   app.blit(bg, (0, 0))
   #game over Text
   font = pygame.font.Font(None, 75)
   text = font.render("Game Over", 1, (255, 255, 255))
-  app.blit(text, (200, 200))
+  app.blit(text, (200, 100))
 
-  font = pygame.font.Font(None, 50)
-  text = font.render("Your sore: "+str(score), 1, (255, 255, 255))
-  app.blit(text, (250, 350))
+  if h_score<= score:
+    font = pygame.font.Font(None, 50)
+    text = font.render("New High Score: "+str(score), 1, (255, 255, 255))
+    app.blit(text, (200, 250))
 
-  text = font.render("Press Space key to restart", 1, (255, 255, 255))
-  app.blit(text, (150, 450))
+  else:
+    font = pygame.font.Font(None, 50)
+    text = font.render("Your score: "+str(score), 1, (255, 255, 255))
+    app.blit(text, (230, 250))
+
+  font = pygame.font.Font(None, 35)
+  text = font.render("Press Space key to Restart", 1, (255, 255, 255))
+  app.blit(text, (195, 400))
+
+  text = font.render("Press Shift key to Choose Another Car", 1, (255, 255, 255))
+  app.blit(text, (130, 450))
 
   pygame.display.update()
 
@@ -150,9 +182,115 @@ def game_over_screen():
                 pygame.quit()
 
             keys_pressed = pygame.key.get_pressed()
+            if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT]:
+              choose_car_screen()
+
+            keys_pressed = pygame.key.get_pressed()
             if keys_pressed[pygame.K_SPACE]:
               waiting = False
+            
 
+#Function to choose car from the list
+def choose_car_screen():
+  waiting1 = True
+  while waiting1:
+    app.blit(bg, (0, 0))
+    font = pygame.font.Font(None, 35)
+    text = font.render("Tap on the car to choose then Space to start", 1, (255, 255, 255))
+    app.blit(text, (92, 100))
+
+    app.blit(car_0, (200, 200))
+    app.blit(car_1, (200, 375))
+    app.blit(car_2, (200, 550))
+    app.blit(car_3, (450, 200))
+    app.blit(car_4, (450, 375))
+    app.blit(car_5, (450, 550))
+
+    font = pygame.font.Font(None, 25)
+    text = font.render("1.", 1, (255, 255, 255))
+    app.blit(text, (185, 200))
+
+    text = font.render("2.", 1, (255, 255, 255))
+    app.blit(text, (185, 375))
+
+    text = font.render("3.", 1, (255, 255, 255))
+    app.blit(text, (185, 550))
+
+    text = font.render("4.", 1, (255, 255, 255))
+    app.blit(text, (435, 200))
+
+    text = font.render("5.", 1, (255, 255, 255))
+    app.blit(text, (435, 375))
+
+    text = font.render("6.", 1, (255, 255, 255))
+    app.blit(text, (435, 550))
+
+    for event in pygame.mouse.get_pressed():
+      x, y = pygame.mouse.get_pos()
+      
+      if x in range (200,250):
+        if y in range (200,300):
+            pygame.draw.rect(app,(0,0,0),(195,195,60,110) , 5)
+            var.player_car=car_0
+
+        if y in range (375,475):
+            if h_score>30:
+                pygame.draw.rect(app,(0,0,0),(195,370,60,110) , 5)
+                var.player_car=car_1
+            else:
+                font = pygame.font.Font(None, 30)
+                text = font.render("Your Highscore must be more than 30 to choose this car", 1, (255, 255, 255))
+                app.blit(text, (70, 325))
+
+        if y in range (550,650):
+            if h_score>50:
+                pygame.draw.rect(app,(0,0,0),(195,545,60,110) , 5)
+                var.player_car=car_2
+            else:
+                font = pygame.font.Font(None, 30)
+                text = font.render("Your Highscore must be more than 50 to choose this car", 1, (255, 255, 255))
+                app.blit(text, (70, 325))
+
+      if x in range (450,500):
+        if y in range (200,300):
+            if h_score>70:
+                pygame.draw.rect(app,(0,0,0),(445,195,60,110) , 5)
+                var.player_car=car_3
+            else:
+                font = pygame.font.Font(None, 30)
+                text = font.render("Your Highscore must be more than 70 to choose this car", 1, (255, 255, 255))
+                app.blit(text, (70, 325))
+
+        
+        if y in range (375,475):
+            if h_score>100:
+                pygame.draw.rect(app,(0,0,0),(445,370,60,110) , 5)
+                var.player_car=car_4
+            else:
+                font = pygame.font.Font(None, 30)
+                text = font.render("Your Highscore must be more than 100 to choose this car", 1, (255, 255, 255))
+                app.blit(text, (70, 325))
+
+        
+        if y in range (550,650):
+            if h_score>120:
+                pygame.draw.rect(app,(0,0,0),(445,545,60,110) , 5)
+                var.player_car=car_5
+            else:
+                font = pygame.font.Font(None, 30)
+                text = font.render("Your Highscore must be more than 120 to choose this car", 1, (255, 255, 255))
+                app.blit(text, (70, 325))
+
+
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+          pygame.quit()
+
+      keys_pressed = pygame.key.get_pressed()
+      if keys_pressed[pygame.K_SPACE]:
+        waiting1 = False
+
+    pygame.display.update()
 
 #Game Start Screen
 def game_Start_screen():
@@ -165,6 +303,10 @@ def game_Start_screen():
   text = font.render("Press Space key to Start", 1, (255, 255, 255))
   app.blit(text, (190, 350))
 
+  font = pygame.font.Font(None, 35)
+  text = font.render("Press Shift key to Choose Another Car", 1, (255, 255, 255))
+  app.blit(text, (130, 450))
+
   pygame.display.update()
 
   #loop to Wait For user until he presses Space Bar or Exit
@@ -174,14 +316,17 @@ def game_Start_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+            
+            keys_pressed = pygame.key.get_pressed()
+            if keys_pressed[pygame.K_LSHIFT] or keys_pressed[pygame.K_RSHIFT]:
+              choose_car_screen()
 
             keys_pressed = pygame.key.get_pressed()
             if keys_pressed[pygame.K_SPACE]:
               waiting1 = False
 
-
 clock = pygame.time.Clock()
-   
+var= car_variable()
 
 # The window closes after few time to stop that we need to make a loop.
 runtime = True
@@ -199,8 +344,18 @@ while runtime:
 
   #Game over Logic
   if game_over:
-    game_over_screen()
+
+    if h_score<int(score):
+      score_file['score'] = h_score = score
+    score_file.close()
+    score_file = shelve.open(high_score)
+
+    if score<0:
+      score=0
+
+    game_over_screen() 
     game_over = False
+
     #Resetting everything on starting
     a1 = 0
     b1 = 233
@@ -284,7 +439,7 @@ while runtime:
 
   if b1 >= 700:
     b1 = -100
-    b = random.randint(400, 545)
+    b = random.randint(400, 545) 
     score = score+1
 
   #Restarting the strips
@@ -335,11 +490,11 @@ while runtime:
   t5 = t5+speed
   t6 = t6+speed
 
-  #Creating the Carsh logic.
-  for k in (x, x+50):
+  #Creating the Crash logic.
+  for k in (x, x+25, x+50):
     for l in (y, y+100):
-        #Every point in  Area of my car
-        
+      #Every point in  Area of my car
+
       for i in range(a1, a1+100):
         for j in range(a, a+45):
         
@@ -364,3 +519,5 @@ while runtime:
             game_over = True
 
   images()
+
+pygame.quit()
