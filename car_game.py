@@ -36,8 +36,6 @@ blue_car = pygame.image.load(path.join(path.dirname(__file__), "data","blue.png"
 white_car = pygame.image.load(path.join(path.dirname(__file__), "data","white.png"))
 yellow_car = pygame.image.load(path.join(path.dirname(__file__), "data","yellow.png"))
 
-#importing crash sound
-crash = pygame.mixer.Sound(path.join(path.dirname(__file__), "data","crash.wav"))
 
 # importing game's high scores.
 high_score= path.join(path.dirname(__file__), "data","score")
@@ -51,6 +49,7 @@ except:
     score_file['score']=0
     score_file.close()
     score_file =shelve.open(high_score)
+    h_score=0
 
 class car_variable(object):
     def __init__(self):
@@ -59,10 +58,10 @@ class car_variable(object):
 #Creating variables to move our car in window
 x = 200
 y = 600
-speed = 2
+speed = 4
 score = -3
-speed_inc=10
-car_speed = 2  # Speed of random car with respect to frame.
+speed_inc=5
+car_speed = 4 # Speed of random car with respect to frame.
 
 #variables for the random/computer generated cars
 #setting intial values for cars
@@ -112,6 +111,11 @@ def images():
   app.blit(strip, (d, d6))
   app.blit(strip, (d, d7))
 
+# FPs Counter
+#  font = pygame.font.SysFont('calibri', 50)
+#  fps_text = font.render(str(int(clock.get_fps())),  1, (255, 255, 255))
+#  app.blit(fps_text, (0,10))
+
   #inserting Trees
   app.blit(tree, (t, t1))
   app.blit(tree, (tr, t2))
@@ -128,11 +132,11 @@ def images():
 
   #Creating the Score Board
   if score>=0:
-    font = pygame.font.Font(None, 50)
+    font = pygame.font.SysFont('calibri', 50)
     text = font.render("Score: "+str(score), 1, (255, 255, 255))
     app.blit(text, (55, 10))
 
-  font = pygame.font.Font(None, 50)
+  font = pygame.font.SysFont('calibri', 50)
   text = font.render("High Score: "+str(h_score), 1, (255, 255, 255))
   app.blit(text, (370, 10))
 
@@ -145,27 +149,27 @@ def images():
 def accident(x, y):
   app.blit(boom, (x, y))
   pygame.display.update()
-  pygame.time.delay(500)
+  pygame.time.delay(700)
 
 #Game Over Screen
 def game_over_screen():
   app.blit(bg, (0, 0))
   #game over Text
-  font = pygame.font.Font(None, 75)
+  font = pygame.font.SysFont('calibri', 75)
   text = font.render("Game Over", 1, (255, 255, 255))
   app.blit(text, (200, 100))
 
   if h_score<= score:
-    font = pygame.font.Font(None, 50)
+    font = pygame.font.SysFont('calibri', 50)
     text = font.render("New High Score: "+str(score), 1, (255, 255, 255))
     app.blit(text, (200, 250))
 
   else:
-    font = pygame.font.Font(None, 50)
+    font = pygame.font.SysFont('calibri', 50)
     text = font.render("Your score: "+str(score), 1, (255, 255, 255))
     app.blit(text, (230, 250))
 
-  font = pygame.font.Font(None, 35)
+  font = pygame.font.SysFont('calibri', 35)
   text = font.render("Press Space key to Restart", 1, (255, 255, 255))
   app.blit(text, (195, 400))
 
@@ -195,7 +199,7 @@ def choose_car_screen():
   waiting1 = True
   while waiting1:
     app.blit(bg, (0, 0))
-    font = pygame.font.Font(None, 35)
+    font = pygame.font.SysFont('calibri', 35)
     text = font.render("Tap on the car to choose then Space to start", 1, (255, 255, 255))
     app.blit(text, (92, 100))
 
@@ -206,7 +210,7 @@ def choose_car_screen():
     app.blit(car_4, (450, 375))
     app.blit(car_5, (450, 550))
 
-    font = pygame.font.Font(None, 25)
+    font = pygame.font.SysFont('calibri', 25)
     text = font.render("1.", 1, (255, 255, 255))
     app.blit(text, (185, 200))
 
@@ -238,7 +242,7 @@ def choose_car_screen():
                 pygame.draw.rect(app,(0,0,0),(195,370,60,110) , 5)
                 var.player_car=car_1
             else:
-                font = pygame.font.Font(None, 30)
+                font = pygame.font.SysFont('calibri', 30)
                 text = font.render("Your Highscore must be more than 30 to choose this car", 1, (255, 255, 255))
                 app.blit(text, (70, 325))
 
@@ -247,7 +251,7 @@ def choose_car_screen():
                 pygame.draw.rect(app,(0,0,0),(195,545,60,110) , 5)
                 var.player_car=car_2
             else:
-                font = pygame.font.Font(None, 30)
+                font = pygame.font.SysFont('calibri', 30)
                 text = font.render("Your Highscore must be more than 50 to choose this car", 1, (255, 255, 255))
                 app.blit(text, (70, 325))
 
@@ -257,7 +261,7 @@ def choose_car_screen():
                 pygame.draw.rect(app,(0,0,0),(445,195,60,110) , 5)
                 var.player_car=car_3
             else:
-                font = pygame.font.Font(None, 30)
+                font = pygame.font.SysFont('calibri', 30)
                 text = font.render("Your Highscore must be more than 70 to choose this car", 1, (255, 255, 255))
                 app.blit(text, (70, 325))
 
@@ -267,7 +271,7 @@ def choose_car_screen():
                 pygame.draw.rect(app,(0,0,0),(445,370,60,110) , 5)
                 var.player_car=car_4
             else:
-                font = pygame.font.Font(None, 30)
+                font = pygame.font.SysFont('calibri', 30)
                 text = font.render("Your Highscore must be more than 100 to choose this car", 1, (255, 255, 255))
                 app.blit(text, (70, 325))
 
@@ -277,7 +281,7 @@ def choose_car_screen():
                 pygame.draw.rect(app,(0,0,0),(445,545,60,110) , 5)
                 var.player_car=car_5
             else:
-                font = pygame.font.Font(None, 30)
+                font = pygame.font.SysFont('calibri', 30)
                 text = font.render("Your Highscore must be more than 120 to choose this car", 1, (255, 255, 255))
                 app.blit(text, (70, 325))
 
@@ -296,14 +300,14 @@ def choose_car_screen():
 def game_Start_screen():
   app.blit(bg, (0, 0))
   #game over Text
-  font = pygame.font.Font(None, 40)
+  font = pygame.font.SysFont('calibri', 40)
   text = font.render("Welcome to car Game", 1, (255, 255, 255))
   app.blit(text, (200, 200))
 
   text = font.render("Press Space key to Start", 1, (255, 255, 255))
   app.blit(text, (190, 350))
 
-  font = pygame.font.Font(None, 35)
+  font = pygame.font.SysFont('calibri', 35)
   text = font.render("Press Shift key to Choose Another Car", 1, (255, 255, 255))
   app.blit(text, (130, 450))
 
@@ -335,7 +339,7 @@ start_game = True
 while runtime:
 
    # creating a FPS lock for the game.
-  clock.tick(60)
+  clock.tick(40)
 
   # creating a Start screen for game
   if start_game:
@@ -366,8 +370,8 @@ while runtime:
     x = 200
     y = 600
     score = -3
-    speed = 2
-    car_speed=1
+    speed = 4
+    car_speed=4
     
   # Creating a way to exit the program.
   for event in pygame.event.get():
@@ -500,24 +504,36 @@ while runtime:
         
           #All 4 corners of front coming cars
           if k == j and l == i:
-            crash.play()
             accident(x, y)
             game_over = True
 
       for i in range(b1, b1+100):
         for j in range(b, b+45):
           if k == j and l == i:
-            crash.play()  
             accident(x, y)
             game_over = True
 
       for i in range(c1, c1+100):
         for j in range(c, c+45):
           if k == j and l == i:
-            crash.play()
             accident(x, y)
             game_over = True
 
   images()
 
 pygame.quit()
+
+#Cheat to increase high score to 150
+#import shelve
+#import os
+
+#score_file=os.path.join(os.path.dirname(__file__), "data","score")
+
+#score=150
+#try:
+#    d = shelve.open(score_file)   
+#    h_score  = d['score']        
+#except:
+#    d = shelve.open(score_file)   
+#    d['score']=150
+#d['score'] = score
